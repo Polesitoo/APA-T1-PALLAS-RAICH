@@ -2,7 +2,7 @@
 
 ## Pol Raich i Víctor Pallàs
 
-
+## s'ha de borrar PROVA
 
 
 ## Proves i exercicis a fer i entregar
