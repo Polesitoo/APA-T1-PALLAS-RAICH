@@ -201,3 +201,43 @@ Podem arribar a escoltar vagament aquest senyal si estem en silenci absolut i pu
 
 ### 2. Modifica el programa per considerar com a senyal a analitzar el senyal del fitxer wav que has creat (`x_r, fm = sf.read('nom_fitxer.wav')`).
 
+
+```python
+fm = 9000
+L = int(fm * T)
+t = Tm*np.arange(L)
+x_r, fm = sf.read('so_4000.wav')
+fx = 4000
+Tx = 1/fx
+Ls = int(fm*5*Tx)
+
+
+
+plt.figure(7)
+plt.ylim(bottom = -2, top = 2)
+plt.plot(t[:Ls], x_r[:Ls])                
+plt.xlabel('t en segons')                 
+plt.title('5 periodes de la sinusoide')
+plt.savefig('img/sinusoide_4kHz_remostrejada.png')
+plt.show()
+
+N = 5000
+x_fft=fft(x_r[:Ls], N)
+
+k = np.arange(N)
+plt.figure(8)
+plt.subplot(211)
+plt.plot(k, abs(x_fft))
+
+
+plt.title(f'Tranformada de Fourier')
+plt.ylabel('|X[k]|')
+plt.subplot(212)
+plt.plot(k, np.unwrap(np.angle(x_fft)))
+plt.xlabel('Index k')
+plt.ylabel('$\phi_x[k]$')
+plt.show
+```
+
+![f_x = 20 kHz](img/sinusoide_20kHz.png)
+
