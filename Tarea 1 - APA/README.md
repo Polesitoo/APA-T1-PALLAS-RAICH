@@ -130,6 +130,9 @@ plt.title('5 periodes de la sinusoide')   # Títol del gràfic
 sd.play(x, fm)                            # Reproducció d'àudio
 plt.show()
 ```
+
+Gràfica resultant del codi anterior: 
+
 ![f_x = 4 kHz](img/sinusoide_4kHz.png)
 
 Degut a que hem canviat la freqüència de la pròpia sinusoide, per a que es faci bé el mostreig i el sistema pugui escriure, reproduir i graficar la senyal correctament, hem de canviar la freqüència de mostreig també.
@@ -197,7 +200,6 @@ k = np.arange(N)
 plt.figure(8)
 plt.subplot(211)
 plt.plot(k, abs(x_fft))
-
 plt.title(f'Tranformada de Fourier')
 plt.ylabel('|X[k]|')
 plt.subplot(212)
@@ -206,25 +208,13 @@ plt.xlabel('Index k')
 plt.ylabel('$\phi_x[k]$')
 plt.show
 ```
+Gràfica resultant del codi anterior: 
 
 ![f_x = 20 kHz](img/sinusoide_20kHz.png)
 
-### Modifica el programa per representar el mòdul de la Transformada de Fourier en dB i l'eix d'abscisses en el marge de 
-$0$ a $f_m/2$ en Hz.
-- Comprova que la mesura de freqüència es correspon amb la freqüència de la sinusoide que has fet servir.  
+### 3. Modifica el programa per representar el mòdul de la Transformada de Fourier en dB i l'eix d'abscisses en el marge de $0$ a $f_m/2$ en Hz. 
 
-- Com pots identificar l'amplitud de la sinusoide a partir de la representació de la transformada?
-        Comprova-ho amb el senyal generat.
-
-    > NOTES:
-    >
-    > - Per representar en dB has de fer servir la fórmula següent:
-    >
-    > $X_{dB}(f) = 20\log_{10}\left(\frac{\left|X(f)\right|}{\max(\left|X(f)\right|}\right)$
-    >
-    > - La relació entre els valors de l'índex k i la freqüència en Hz és:
-    >
-    > $f_k = \frac{k}{N} f_m$
+Per aquest exercici farem servir el to de 50 Hz de l'exercici 1, canviant la dimensió de la transformada discreta a N=50000, per poder visualitzar adequadament la gràfica:
 
 ```pyhton
 T= 2.5 
@@ -254,4 +244,32 @@ plt.xlabel('Hz')
 plt.savefig('img/sinusoide_6KHz_YdB_XHz_.png')
 plt.show
 ```
+Gràfica resultant del codi anterior: 
 ![f_x = 6 kHz](img/sinusoide_6KHz_YdB_XHz_.png)
+
+  - Comprova que la mesura de freqüència es correspon amb la freqüència de la sinusoide que has fet servir.  
+  
+La mesura de la frequencia es correspon amb la freqüència de la sinusoide (50hz), ja que el seu pic (valor màxim d'àmplitud) al modul de la transformada està pel valor de 50Hz a l'eix X.  
+    
+  - Com pots identificar l'amplitud de la sinusoide a partir de la representació de la transformada? Comprova-ho amb el senyal generat.
+  
+L'amplitud màxima del mòdul és 0 dB. L'amplitud de la sinusoide equivaldrà a aquest valor passat a escala líneal: 10^(0/20) = 1 = Amplitud de la sinusoide.
+
+> NOTES:
+>
+> - Per representar en dB has de fer servir la fórmula següent:
+>
+> $X_{dB}(f) = 20\log_{10}\left(\frac{\left|X(f)\right|}{\max(\left|X(f)\right|}\right)$
+>
+> - La relació entre els valors de l'índex k i la freqüència en Hz és:
+>
+> $f_k = \frac{k}{N} f_m$
+
+### 4.Tria un fitxer d'àudio en format wav i mono (el pots aconseguir si en tens amb altres formats amb el programa Audacity).
+Llegeix el fitxer d'àudio i comprova:
+
+- Freqüència de mostratge.
+- Nombre de mostres de senyal.
+- Tria un segment de senyal de 25ms i insereix una gráfica amb la seva evolució temporal.
+- Representa la seva transformada en dB en funció de la freqüència, en el marge $0\le f\le f_m/2$.
+- Quines son les freqüències més importants del segment triat?
