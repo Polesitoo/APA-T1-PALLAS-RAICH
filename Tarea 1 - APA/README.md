@@ -268,8 +268,49 @@ L'amplitud màxima del mòdul és 0 dB. L'amplitud de la sinusoide equivaldrà a
 ### 4.Tria un fitxer d'àudio en format wav i mono (el pots aconseguir si en tens amb altres formats amb el programa Audacity).
 Llegeix el fitxer d'àudio i comprova:
 
-- Freqüència de mostratge.
-- Nombre de mostres de senyal.
+- Freqüència de mostratge i nombre de mostres de senyal.
+```python
+s, fm = sf.read('wav/Dark Aria LV2.wav')
+nMostres = len(s)
+print('Freqüència de mostratge (Hz): ', fm)
+print('Nombre de mostres: ', nMostres)
+```
+Amb el codi anterior obtenim una freqüència de mostratge de 44100Hz i 12651408 mostres 
 - Tria un segment de senyal de 25ms i insereix una gráfica amb la seva evolució temporal.
+```python
+t0 = 30                 # Inici del segment
+tt = 0.025              # Durada del segment
+L1 = int(fm * t0)
+L2 = int(fm * (t0 + tt))
+
+Tm = 1 / fm
+t = Tm * np.arange(L1,L2)
+plt.figure(10)
+plt.plot(t, s[L1:L2])
+plt.savefig('img/Segment_25ms_Wicked_Game.png')
+plt.show()
+```
+Gràfica resultant del codi anterior:
+![f_x = 48 kHz](img/Segment_25ms_Wicked_Game.png)
+
 - Representa la seva transformada en dB en funció de la freqüència, en el marge $0\le f\le f_m/2$.
+```python
+N=fm
+S=fft(s[L1:L2], N)       
+S_dB = 20*np.log10(np.abs(S)/max(np.abs(S)))
+k=np.arange(N)
+fk =(k/N)*fm
+plt.figure(11)       
+plt.plot(fk[0:int(fm/2)], S_dB[0:int(fm/2)])
+plt.title(f'Transformada del senyal de Ls={L2-L1} mostres amb DFT de N={N}')
+plt.ylabel('|S[k]|(dB)')
+plt.xlabel('Hz')
+plt.show() 
+```
+Gràfica resultant del codi anterior:
+![f_x = 48 kHz](img/Transformada_Segment_25ms_Wicked_Game.png)
 - Quines son les freqüències més importants del segment triat?
+  Les seguents freqüències estan ordenades de major a menor importancia.
+  - Freqs. al voltant dels 50Hz
+  - Freqs. al voltant dels 1KHz
+  - Seguint una succecio de descendencia cap a les freqs. de 15KHz
