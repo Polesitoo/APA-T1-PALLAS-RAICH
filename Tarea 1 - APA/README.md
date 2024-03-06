@@ -210,7 +210,10 @@ plt.show
 ```
 Gràfica resultant del codi anterior: 
 
-![f_x = 20 kHz](img/sinusoide_20kHz.png)
+![f_x = 4 kHz remostrejada](img/sinusoide_4kHz_remostrejada.png)
+![f_x = 20 kHz](img/TF_sinusoide_4kHz_remostrejada.png)
+
+
 
 ### 3. Modifica el programa per representar el mòdul de la Transformada de Fourier en dB i l'eix d'abscisses en el marge de $0$ a $f_m/2$ en Hz. 
 
