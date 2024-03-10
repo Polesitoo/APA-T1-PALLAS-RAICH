@@ -110,24 +110,24 @@ Farem proves amb freqüències des de $4$ kHz fins al límit audible $20$ kHz
 
 ### $f_x = 4$ kHz
 ```python
-T= 2.5                               
-fm=80000                                  # Freqüència de mostratge en Hz
+T= 2.5                                    # Durada de T segons
+fm=44100                                 # Freqüència de mostratge en Hz
 fx=4000                                   # Freqüència de la sinusoide
-A=4                                  
-pi=np.pi                             
+A=1                                       # Amplitud de la sinusoide
+pi=np.pi                                  # Valor del número pi
 L = int(fm * T)                           # Nombre de mostres del senyal digital
 Tm=1/fm                                   # Període de mostratge
 t=Tm*np.arange(L)                         # Vector amb els valors de la variable temporal, de 0 a T
 x = A * np.cos(2 * pi * fx * t)           # Senyal sinusoidal
-sf.write('wav/so_4000.wav', x, fm)            # Escriptura del senyal a un fitxer en format wav
+sf.write('wav/so_4000.wav', x, fm)        # Escriptura del senyal a un fitxer en format wav
 Tx=1/fx                                   # Període del senyal
 Ls=int(fm*5*Tx)                           # Nombre de mostres corresponents a 5 períodes de la sinusoide
-
 plt.figure(0)                             # Nova figura
 plt.plot(t[0:Ls], x[0:Ls])                # Representació del senyal en funció del temps
 plt.xlabel('t en segons')                 # Etiqueta eix temporal
 plt.title('5 periodes de la sinusoide')   # Títol del gràfic
 sd.play(x, fm)                            # Reproducció d'àudio
+plt.savefig('img/sinusoide_4kHz.png')     # Escriptura de la gràfica del senyal en un fitxer png
 plt.show()
 ```
 
@@ -177,7 +177,7 @@ Podem arribar a escoltar vagament aquest senyal si estem en silenci absolut i pu
 
 
 ```python
-fm = 9000
+fm = 44100
 L = int(fm * T)
 t = Tm*np.arange(L)
 x_r, fm = sf.read('wav/so_4000.wav')
@@ -206,6 +206,7 @@ plt.subplot(212)
 plt.plot(k, np.unwrap(np.angle(x_fft)))
 plt.xlabel('Index k')
 plt.ylabel('$\phi_x[k]$')
+plt.savefig('img/TF_sinusoide_4kHz_remostrejada.png')
 plt.show
 ```
 Gràfica resultant del codi anterior: 
@@ -217,44 +218,50 @@ Gràfica resultant del codi anterior:
 
 ### 3. Modifica el programa per representar el mòdul de la Transformada de Fourier en dB i l'eix d'abscisses en el marge de $0$ a $f_m/2$ en Hz. 
 
-Per aquest exercici farem servir el to de 50 Hz de l'exercici 1, canviant la dimensió de la transformada discreta a N=50000, per poder visualitzar adequadament la gràfica:
+Per aquest exercici farem servir el mateix arxiu del to de 4000Hz de l'apartat 1.
 
-```pyhton
-T= 2.5 
-fm = 6000
-fz = 50                                                 # Frequencia del senyal
-A = 4
-L = int(fm * T)
-pi = np.pi
-Tm = 1 / fm
-t = Tm * np.arange(L)
-x_r = A * np.cos(2 * pi * f * t)                        # Senyal sinusoidal ex1
-sf.write('so_ex1_50.wav', x_r, fm)                      # Creem un archiu a frequencia 50
+```python
+x, fm = sf.read('wav/so_4000.wav')
 
-Tz = 1 / fz
-Ls = int(fm * 5 * Tz)
+# Calcula la Transformada de Fourier
+X = fft(x)
 
-N = 50000
-x_fft=fft(x_r[:Ls], N)
-k = np.arange(N)
-XdB = 20*np.log10(np.abs(x_fft) / max(np.abs(x_fft)))
-fk = (k / N)*fm
-plt.figure(9)
-plt.title(f'Transformada del senyal de Ls={Ls} mostres amb DFT de N={N}')
-plt.ylabel("|X[k]|(dB's)")
-plt.plot(fk[0:int(fm/2)], XdB[0:int(fm/2)]) 
-plt.xlabel('Hz')
-plt.savefig('img/sinusoide_6KHz_YdB_XHz_.png')
-plt.show
+# Calcula el espectro de amplitud
+amplitude_spectrum = 2 / L * np.abs(X[:L//2])
+
+# Añade un pequeño offset para evitar el logaritmo de cero
+amplitude_spectrum[amplitude_spectrum == 0] = 1e-10  # Usando un valor pequeño
+
+# Convierte el espectro de amplitud a decibelios
+amplitude_spectrum_dB = 20 * np.log10(amplitude_spectrum)
+
+# Crea el vector de frecuencias
+frequencies = np.arange(0, fm / 2, fm / (2 * (L // 2)))
+
+# Gráfica
+plt.figure(figsize=(10, 5))
+plt.plot(frequencies, amplitude_spectrum_dB)
+plt.title('Transformada de Fourier de la señal en dB')
+plt.xlabel('Frecuencia (Hz)')
+plt.ylabel('Amplitud (dB)')
+plt.ylim(-150, plt.ylim()[1])
+plt.grid(True)
+
+# Configuración de etiquetas en el eje x
+plt.xticks([500, 2500, 4000, 10000, 15000, 22050], ['500', '2500', '4000', '10000', '15000', '22050'])
+
+plt.show()
+sd.play(x, fm)
 ```
 Gràfica resultant del codi anterior: 
-![f_x = 6 kHz](img/sinusoide_6KHz_YdB_XHz_.png)
+Cal dir que s'ha retallat la part del soroll que reflexa la transformada per valors mes baixos de -150 dB
+![f_x = 6 kHz](img/TF_dB_4kHz.png)
 
-  - Comprova que la mesura de freqüència es correspon amb la freqüència de la sinusoide que has fet servir.  
+- Comprova que la mesura de freqüència es correspon amb la freqüència de la sinusoide que has fet servir.  
   
-La mesura de la frequencia es correspon amb la freqüència de la sinusoide (50hz), ja que el seu pic (valor màxim d'àmplitud) al modul de la transformada està pel valor de 50Hz a l'eix X.  
+La mesura de la frequencia es correspon amb la freqüència de la sinusoide (4000Hz), ja que el seu pic al modul de la transformada està just en el valor de 4000Hz a l'eix X.  
     
-  - Com pots identificar l'amplitud de la sinusoide a partir de la representació de la transformada? Comprova-ho amb el senyal generat.
+- Com pots identificar l'amplitud de la sinusoide a partir de la representació de la transformada? Comprova-ho amb el senyal generat.
   
 L'amplitud màxima del mòdul és 0 dB. L'amplitud de la sinusoide equivaldrà a aquest valor passat a escala líneal: 10^(0/20) = 1 = Amplitud de la sinusoide.
 
@@ -273,7 +280,7 @@ Llegeix el fitxer d'àudio i comprova:
 
 - Freqüència de mostratge i nombre de mostres de senyal.
 ```python
-s, fm = sf.read('wav/Dark Aria LV2.wav')
+s, fm = sf.read('wav/Wicked Game.wav')
 nMostres = len(s)
 print('Freqüència de mostratge (Hz): ', fm)
 print('Nombre de mostres: ', nMostres)
@@ -288,8 +295,11 @@ L2 = int(fm * (t0 + tt))
 
 Tm = 1 / fm
 t = Tm * np.arange(L1,L2)
-plt.figure(10)
+plt.figure(figsize=(10, 5))
 plt.plot(t, s[L1:L2])
+plt.title('Evolució temporal del segment')
+plt.xlabel('Tepmps [s]')
+plt.ylabel('Amplitud')
 plt.savefig('img/Segment_25ms_Wicked_Game.png')
 plt.show()
 ```
@@ -298,22 +308,43 @@ Gràfica resultant del codi anterior:
 
 - Representa la seva transformada en dB en funció de la freqüència, en el marge $0\le f\le f_m/2$.
 ```python
-N=fm
-S=fft(s[L1:L2], N)       
-S_dB = 20*np.log10(np.abs(S)/max(np.abs(S)))
-k=np.arange(N)
-fk =(k/N)*fm
-plt.figure(11)       
-plt.plot(fk[0:int(fm/2)], S_dB[0:int(fm/2)])
-plt.title(f'Transformada del senyal de Ls={L2-L1} mostres amb DFT de N={N}')
-plt.ylabel('|S[k]|(dB)')
-plt.xlabel('Hz')
-plt.show() 
+# Calcula la Transformada de Fourier
+S = fft(s)
+
+L = int(fm * tt)
+
+amplitude_spectrum = np.abs(S[:L//2]) / np.max(np.abs(S[:L//2]))
+# Añade un pequeño offset para evitar el logaritmo de cero
+amplitude_spectrum[amplitude_spectrum == 0] = 1e-10  # Usando un valor pequeño
+
+amplitude_spectrum_dB = 20 * np.log10(amplitude_spectrum)
+fk = np.arange(0, fm / 2, fm / (2 * (L // 2)))
+
+
+plt.figure(figsize=(10, 5))
+plt.plot(fk, amplitude_spectrum_dB)
+plt.title('Transformada de Fourier de la señal en dB')
+plt.xlabel('Frecuencia (Hz)')
+plt.ylabel('Amplitud (dB)')
+plt.grid(True)
+
+# Configuración de etiquetas en el eje x
+plt.xticks([20, 2500, 5000, 10000, 15000, 22050], ['20', '2500', '5000', '10000', '15000', '22050'])
+plt.savefig('img/Transformada_Segment_25ms_Wicked_Game.png')
+
+
+plt.show()
+start_sample = int(30 * fm)
+end_sample = int((30 + tt) * fm)
+sd.play(s[start_sample:end_sample], fm)
 ```
 Gràfica resultant del codi anterior:
 ![f_x = 48 kHz](img/Transformada_Segment_25ms_Wicked_Game.png)
 - Quines son les freqüències més importants del segment triat?
   Les seguents freqüències estan ordenades de major a menor importancia.
-  - Freqs. al voltant dels 50Hz
-  - Freqs. al voltant dels 1KHz
-  - Seguint una succecio de descendencia cap a les freqs. de 15KHz
+  - Als 20Hz
+  - Freqs. al voltant dels 2.5KHz
+  - Freqs. al voltant dels 20KHz
+  - Freqs. al voltant dels 11KHz
+  - Freqs. al voltant dels 7.5KHz
+  - Totes les demés freqüències entre 20Hz i 20kHz aporten mes o menys el mateix
